@@ -2,7 +2,9 @@
 
 int main() {
 	Graph g;
-	cout << g.size() << '\n';
+	g.interactiveAdd();
+	g.addEdge("a", "v");
+	g.print();
 
 	return 0;
 }
