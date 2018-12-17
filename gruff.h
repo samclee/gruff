@@ -11,14 +11,58 @@ using std::map;
 using std::set;
 using std::string;
 
+/* ========== Node class ========== */
+class Node {
+private:
+	set<string> neighbors;
+	bool marked;
+public:
+	Node();
+
+	bool isMarked();
+	set<string> getNeighbors();
+	void printNeighbors();
+	
+	void mark();
+	void addNeighbor(string);
+	void removeNeighbor(string);
+};
+
+Node::Node() : marked(false) {}
+
+bool Node::isMarked() {
+	return marked;
+} // isMarked()
+
+set<string> Node::getNeighbors() {
+	return neighbors;
+}
+
+void Node::printNeighbors() {
+	for (set<string>::iterator n = neighbors.begin(); n != neighbors.end(); n++)
+			cout << "(" << *n << ") ";
+	cout << '\n';
+} // printNeighbors()
+
+void Node::mark() {
+	marked = true;
+} // mark()
+
+void Node::addNeighbor(string s) {
+	neighbors.insert(s);
+} // addNeighbor()
+
+void Node::removeNeighbor(string s) {
+	neighbors.remove(s);
+}
+
+/* ========== Graph class ========== */
 class Graph {
 private:
-	map<string, set<string>> nodes;
-	bool undirected;
+	map<string, Node> nodes;
 
 public:
 	Graph();
-	Graph(bool);
 	Graph(string);
 
 	void addEdge(string, string);
@@ -28,18 +72,14 @@ public:
 	void print();
 };
 
-Graph::Graph() : undirected(true) {}
-
-Graph::Graph(bool ud) : undirected(ud) {}
+Graph::Graph() {}
 
 Graph::Graph(string filename) {
 	
 }
 
 void Graph::addEdge(string src, string dst) {
-	nodes[src].insert(dst);
-	if (undirected)
-		nodes[dst].insert(src);
+	nodes[src].addNeighbor(dst);
 }
 
 void Graph::interactiveAdd() {
@@ -58,12 +98,9 @@ unsigned int Graph::size() {
 }
 
 void Graph::print() {
-	for (map<string, set<string>>::iterator src = nodes.begin(); src != nodes.end(); src++) {
-		set<string> dsts = src->second;
-		cout << '(' << src->first << ") has edges to:\n";
-
-		for (set<string>::iterator dst = dsts.begin(); dst != dsts.end(); dst++)
-			cout << "\t(" << *dst << ")\n";
+	for (map<string, Node>::iterator src = nodes.begin(); src != nodes.end(); src++) {
+		cout << '(' << src->first << ") has edges to: ";
+		src->second.printNeighbors();
 	}
 }
 
