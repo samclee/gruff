@@ -1,10 +1,11 @@
 #include "gruff.h"
 
 int main() {
-	Graph g;
-	g.interactiveAdd();
+	Graph g("test.txt");
 	g.addEdge("a", "v");
 	g.print();
+
+
 
 	return 0;
 }

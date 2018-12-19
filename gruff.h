@@ -2,11 +2,13 @@
 #define GRUFF_H
 
 #include <iostream>
+#include <fstream>
 #include <map>
 #include <set>
 #include <string>
 using std::cout;
 using std::cin;
+using std::ifstream;
 using std::map;
 using std::set;
 using std::string;
@@ -53,7 +55,7 @@ void Node::addNeighbor(string s) {
 } // addNeighbor()
 
 void Node::removeNeighbor(string s) {
-	neighbors.remove(s);
+	neighbors.erase(s);
 }
 
 /* ========== Graph class ========== */
@@ -65,6 +67,7 @@ public:
 	Graph();
 	Graph(string);
 
+	void addNode(string);
 	void addEdge(string, string);
 	void interactiveAdd();
 	
@@ -75,11 +78,30 @@ public:
 Graph::Graph() {}
 
 Graph::Graph(string filename) {
-	
+	ifstream ifs(filename);
+
+	string line;
+	while (ifs >> line) {
+		int midpoint = line.find("->");
+		if (midpoint == string::npos) {
+			addNode(line);
+			cout << line << '\n';
+			continue;
+		}
+		
+		string src = line.substr(0, midpoint);
+		string dst = line.substr(midpoint+2);
+		addEdge(src, dst);
+	}
+}
+
+void Graph::addNode(string s) {
+	nodes[s];
 }
 
 void Graph::addEdge(string src, string dst) {
 	nodes[src].addNeighbor(dst);
+	addNode(dst);
 }
 
 void Graph::interactiveAdd() {
