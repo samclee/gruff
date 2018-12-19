@@ -13,6 +13,17 @@ using std::map;
 using std::set;
 using std::string;
 
+string eatSpaces(string s) {
+	int l = 0, r = s.size()-1;
+	while (l <= r && s[l] == ' ') l++;
+	while (r >= l && s[r] == ' ') r--;
+
+	if (r < l)
+		return "";
+
+	return s.substr(l, r-l+1);
+}
+
 /* ========== Node class ========== */
 class Node {
 private:
@@ -81,7 +92,7 @@ Graph::Graph(string filename) {
 	ifstream ifs(filename);
 
 	string line;
-	while (ifs >> line) {
+	while (getline(ifs, line)) {
 		int midpoint = line.find("->");
 		if (midpoint == string::npos) {
 			addNode(line);
@@ -90,7 +101,9 @@ Graph::Graph(string filename) {
 		}
 		
 		string src = line.substr(0, midpoint);
+		src = eatSpaces(src);
 		string dst = line.substr(midpoint+2);
+		dst = eatSpaces(dst);
 		addEdge(src, dst);
 	}
 }
