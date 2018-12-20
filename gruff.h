@@ -53,7 +53,7 @@ bool Node::isMarked() {
 
 set<string> Node::getNeighbors() {
 	return neighbors;
-}
+} // getNeighbors()
 
 void Node::printNeighbors() {
 	for (set<string>::iterator n = neighbors.begin(); n != neighbors.end(); n++)
@@ -71,7 +71,7 @@ void Node::addNeighbor(string s) {
 
 void Node::removeNeighbor(string s) {
 	neighbors.erase(s);
-}
+} // removeNeighbor()
 
 /* ========== Graph class ========== */
 class Graph {
@@ -83,7 +83,9 @@ public:
 	Graph(string);
 
 	void addNode(string);
+	void removeNode(string);
 	virtual void addEdge(string, string);
+	virtual void removeEdge(string, string);
 	pair<string,string> parse(string);
 	void interactiveAdd();
 	
@@ -106,16 +108,29 @@ Graph::Graph(string filename) {
 			addEdge(endpoints.first, endpoints.second);
 		}
 	}
-}
+} // file constructor
 
 void Graph::addNode(string s) {
 	nodes[s];
-}
+} // addNode()
+
+void Graph::removeNode(string s) {
+	nodes.erase(s);
+	for (map<string, Node>::iterator src = nodes.begin(); src != nodes.end(); src++) {
+		src->second.removeNeighbor(s);
+	}
+} // removeNode()
 
 void Graph::addEdge(string src, string dst) {
 	nodes[src].addNeighbor(dst);
 	addNode(dst);
-}
+} // addEdge()
+
+void Graph::removeEdge(string src, string dst) {
+	if (nodes.find(src) == nodes.end())
+		return;
+	nodes[src].removeNeighbor(dst);
+} // removeEdge()
 
 pair<string,string> Graph::parse(string line) {
 	string src, dst;
@@ -132,7 +147,7 @@ pair<string,string> Graph::parse(string line) {
 	}
 	
 	return make_pair(src, dst);
-}
+} // parse file input into node names
 
 void Graph::interactiveAdd() {
 	cout << "Enter edges with the format: src -> dst.\nEnter done to finish.\n";
@@ -147,18 +162,18 @@ void Graph::interactiveAdd() {
 			addEdge(endpoints.first, endpoints.second);
 		}
 	}
-}
+} // interactively add nodes
 
 unsigned int Graph::size() {
 	return nodes.size();
-}
+} // size()
 
 void Graph::print() {
 	for (map<string, Node>::iterator src = nodes.begin(); src != nodes.end(); src++) {
 		cout << '(' << src->first << ") has edges to: ";
 		src->second.printNeighbors();
 	}
-}
+} // prints()
 
 /* ========== Undirected Graph class ========== */
 class UndirectedGraph : public Graph {
@@ -167,6 +182,7 @@ public:
 	UndirectedGraph(string);
 
 	virtual void addEdge(string, string);
+	virtual void removeEdge(string, string);
 };
 
 UndirectedGraph::UndirectedGraph() {}
@@ -189,6 +205,13 @@ UndirectedGraph::UndirectedGraph(string filename) : Graph() {
 void UndirectedGraph::addEdge(string src, string dst) {
 	nodes[src].addNeighbor(dst);
 	nodes[dst].addNeighbor(src);
+}
+
+void UndirectedGraph::removeEdge(string src, string dst) {
+	if (nodes.find(src) == nodes.end() || nodes.find(dst) == nodes.end())
+		return;
+	nodes[src].removeNeighbor(dst);
+	nodes[dst].removeNeighbor(src);
 }
 
 #endif

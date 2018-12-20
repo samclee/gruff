@@ -1,8 +1,7 @@
 #include "gruff.h"
 
 int main() {
-	UndirectedGraph g;
-	g.interactiveAdd();
+	UndirectedGraph g("test.txt");
 	g.print();
 
 	return 0;
