@@ -6,12 +6,15 @@
 #include <map>
 #include <set>
 #include <string>
+#include <utility>
 using std::cout;
 using std::cin;
 using std::ifstream;
 using std::map;
 using std::set;
 using std::string;
+using std::pair;
+using std::make_pair;
 
 string eatSpaces(string s) {
 	int l = 0, r = s.size()-1;
@@ -23,6 +26,7 @@ string eatSpaces(string s) {
 
 	return s.substr(l, r-l+1);
 }
+
 
 /* ========== Node class ========== */
 class Node {
@@ -71,7 +75,7 @@ void Node::removeNeighbor(string s) {
 
 /* ========== Graph class ========== */
 class Graph {
-private:
+protected:
 	map<string, Node> nodes;
 
 public:
@@ -79,7 +83,8 @@ public:
 	Graph(string);
 
 	void addNode(string);
-	void addEdge(string, string);
+	virtual void addEdge(string, string);
+	pair<string,string> parse(string);
 	void interactiveAdd();
 	
 	unsigned int size();
@@ -93,18 +98,13 @@ Graph::Graph(string filename) {
 
 	string line;
 	while (getline(ifs, line)) {
-		int midpoint = line.find("->");
-		if (midpoint == string::npos) {
-			addNode(line);
-			cout << line << '\n';
-			continue;
+		pair<string,string> endpoints = parse(line);
+		if (endpoints.second == "") {
+			addNode(endpoints.first);
 		}
-		
-		string src = line.substr(0, midpoint);
-		src = eatSpaces(src);
-		string dst = line.substr(midpoint+2);
-		dst = eatSpaces(dst);
-		addEdge(src, dst);
+		else {
+			addEdge(endpoints.first, endpoints.second);
+		}
 	}
 }
 
@@ -117,14 +117,35 @@ void Graph::addEdge(string src, string dst) {
 	addNode(dst);
 }
 
-void Graph::interactiveAdd() {
-	cout << "Enter edges with the format: src to dst.\nEnter done to finish.\n";
-	string input;
+pair<string,string> Graph::parse(string line) {
+	string src, dst;
 
-	while (input != "done") {
-		cin >> input;
-		// parse
-		// add edge
+	int midpoint = line.find("->");
+	if (midpoint == string::npos) {
+		src = line;
+	}
+	else {
+		src = line.substr(0, midpoint);
+		src = eatSpaces(src);
+		dst = line.substr(midpoint+2);
+		dst = eatSpaces(dst);
+	}
+	
+	return make_pair(src, dst);
+}
+
+void Graph::interactiveAdd() {
+	cout << "Enter edges with the format: src -> dst.\nEnter done to finish.\n";
+	
+	string line;
+	while (getline(cin, line) && line != "done") {
+		pair<string,string> endpoints = parse(line);
+		if (endpoints.second == "") {
+			addNode(endpoints.first);
+		}
+		else {
+			addEdge(endpoints.first, endpoints.second);
+		}
 	}
 }
 
@@ -137,6 +158,37 @@ void Graph::print() {
 		cout << '(' << src->first << ") has edges to: ";
 		src->second.printNeighbors();
 	}
+}
+
+/* ========== Undirected Graph class ========== */
+class UndirectedGraph : public Graph {
+public:
+	UndirectedGraph();
+	UndirectedGraph(string);
+
+	virtual void addEdge(string, string);
+};
+
+UndirectedGraph::UndirectedGraph() {}
+
+UndirectedGraph::UndirectedGraph(string filename) : Graph() {
+	ifstream ifs(filename);
+
+	string line;
+	while (getline(ifs, line)) {
+		pair<string,string> endpoints = parse(line);
+		if (endpoints.second == "") {
+			addNode(endpoints.first);
+		}
+		else {
+			addEdge(endpoints.first, endpoints.second);
+		}
+	}
+}
+
+void UndirectedGraph::addEdge(string src, string dst) {
+	nodes[src].addNeighbor(dst);
+	nodes[dst].addNeighbor(src);
 }
 
 #endif
