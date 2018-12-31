@@ -16,18 +16,6 @@ using std::string;
 using std::pair;
 using std::make_pair;
 
-string eatSpaces(string s) {
-	int l = 0, r = s.size()-1;
-	while (l <= r && s[l] == ' ') l++;
-	while (r >= l && s[r] == ' ') r--;
-
-	if (r < l)
-		return "";
-
-	return s.substr(l, r-l+1);
-}
-
-
 /* ========== Node class ========== */
 class Node {
 private:
@@ -36,9 +24,9 @@ private:
 public:
 	Node();
 
-	bool isMarked();
-	set<string> getNeighbors();
-	void printNeighbors();
+	bool isMarked() const;
+	set<string> getNeighbors() const;
+	void printNeighbors() const;
 	
 	void mark();
 	void addNeighbor(string);
@@ -47,15 +35,15 @@ public:
 
 Node::Node() : marked(false) {}
 
-bool Node::isMarked() {
+bool Node::isMarked() const {
 	return marked;
 } // isMarked()
 
-set<string> Node::getNeighbors() {
+set<string> Node::getNeighbors() const {
 	return neighbors;
 } // getNeighbors()
 
-void Node::printNeighbors() {
+void Node::printNeighbors() const {
 	for (set<string>::iterator n = neighbors.begin(); n != neighbors.end(); n++)
 			cout << "(" << *n << ") ";
 	cout << '\n';
@@ -77,7 +65,8 @@ void Node::removeNeighbor(string s) {
 class Graph {
 protected:
 	map<string, Node> nodes;
-
+	string eatSpaces(string) const;
+	pair<string,string> parse(string) const;
 public:
 	Graph();
 	Graph(string);
@@ -86,10 +75,9 @@ public:
 	void removeNode(string);
 	virtual void addEdge(string, string);
 	virtual void removeEdge(string, string);
-	pair<string,string> parse(string);
-	void interactiveAdd();
 	
-	unsigned int size();
+	void interactiveAdd();	
+	unsigned int size() const;
 	void print();
 };
 
@@ -132,7 +120,7 @@ void Graph::removeEdge(string src, string dst) {
 	nodes[src].removeNeighbor(dst);
 } // removeEdge()
 
-pair<string,string> Graph::parse(string line) {
+pair<string,string> Graph::parse(string line) const {
 	string src, dst;
 
 	int midpoint = line.find("->");
@@ -164,11 +152,22 @@ void Graph::interactiveAdd() {
 	}
 } // interactively add nodes
 
-unsigned int Graph::size() {
+unsigned int Graph::size() const {
 	return nodes.size();
 } // size()
 
-void Graph::print() {
+string Graph::eatSpaces(string s) const {
+	int l = 0, r = s.size()-1;
+	while (l <= r && s[l] == ' ') l++;
+	while (r >= l && s[r] == ' ') r--;
+
+	if (r < l)
+		return "";
+
+	return s.substr(l, r-l+1);
+} // eatSpaces()
+
+void Graph::print(){
 	for (map<string, Node>::iterator src = nodes.begin(); src != nodes.end(); src++) {
 		cout << '(' << src->first << ") has edges to: ";
 		src->second.printNeighbors();
@@ -200,18 +199,18 @@ UndirectedGraph::UndirectedGraph(string filename) : Graph() {
 			addEdge(endpoints.first, endpoints.second);
 		}
 	}
-}
+} // file constructor
 
 void UndirectedGraph::addEdge(string src, string dst) {
 	nodes[src].addNeighbor(dst);
 	nodes[dst].addNeighbor(src);
-}
+} // addEdge()
 
 void UndirectedGraph::removeEdge(string src, string dst) {
 	if (nodes.find(src) == nodes.end() || nodes.find(dst) == nodes.end())
 		return;
 	nodes[src].removeNeighbor(dst);
 	nodes[dst].removeNeighbor(src);
-}
+} // removeEdge()
 
 #endif
