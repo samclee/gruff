@@ -71,6 +71,10 @@ public:
 	Graph();
 	Graph(string);
 
+	set<string> getNeighborsOf(string);
+	void mark(string);
+	bool isMarked(string);
+
 	void addNode(string);
 	void removeNode(string);
 	virtual void addEdge(string, string);
@@ -97,6 +101,23 @@ Graph::Graph(string filename) {
 		}
 	}
 } // file constructor
+
+set<string> Graph::getNeighborsOf(string name) {
+	if (nodes.find(name) != nodes.end())
+		return nodes[name].getNeighbors();
+	return set<string>();
+} // getNode()
+
+void Graph::mark(string name) {
+	if (nodes.find(name) != nodes.end())
+		nodes[name].mark();
+} // mark()
+
+bool Graph::isMarked(string name) {
+	if (nodes.find(name) != nodes.end())
+		return nodes[name].isMarked();
+	return false;
+}
 
 void Graph::addNode(string s) {
 	nodes[s];
