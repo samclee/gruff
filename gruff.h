@@ -169,7 +169,11 @@ string Graph::eatSpaces(string s) const {
 
 void Graph::print(){
 	for (map<string, Node>::iterator src = nodes.begin(); src != nodes.end(); src++) {
-		cout << '(' << src->first << ") has edges to: ";
+		cout << '[';
+		if (src->second.isMarked()) cout << 'x';
+		else cout << ' ';
+
+		cout << "] (" << src->first << ") has edges to: ";
 		src->second.printNeighbors();
 	}
 } // prints()
