@@ -14,6 +14,9 @@ int main() {
 	for (string n : cnbors)
 		cout << n << '\n';
 	g.print();
+	set<string> toC = g.getNeighborsTo("c");
+	for (string n : toC)
+		cout << n << '\n';
 
 	return 0;
 }

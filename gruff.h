@@ -72,8 +72,10 @@ public:
 	Graph(string);
 
 	set<string> getNeighborsOf(string);
+	set<string> getNeighborsTo(string);
 	void mark(string);
 	bool isMarked(string);
+	map<string, Node> getNodes() const;
 
 	void addNode(string);
 	void removeNode(string);
@@ -108,15 +110,30 @@ set<string> Graph::getNeighborsOf(string name) {
 	return set<string>();
 } // getNode()
 
+set<string> Graph::getNeighborsTo(string name) {
+	set<string> to;
+	for (auto iter: nodes) {
+		set<string> curNbors = iter.second.getNeighbors();
+		if (curNbors.find(name) != curNbors.end())
+			to.insert(iter.first);
+	}
+	
+	return to;
+} // getNode()
+
 void Graph::mark(string name) {
 	if (nodes.find(name) != nodes.end())
 		nodes[name].mark();
 } // mark()
 
-bool Graph::isMarked(string name) {
+bool Graph::isMarked(string name){
 	if (nodes.find(name) != nodes.end())
 		return nodes[name].isMarked();
 	return false;
+}
+
+map<string, Node> Graph::getNodes() const {
+	return nodes;
 }
 
 void Graph::addNode(string s) {
